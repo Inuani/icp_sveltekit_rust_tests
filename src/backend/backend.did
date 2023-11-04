@@ -1,1 +1,13 @@
-service : { hello : (text) -> (text) query; world : (text) -> (text) }
+type Denizen = record {
+	xp : nat64;
+	"principal" : principal;
+	level : nat64;
+	token_balance : nat64;
+	dname : text;
+};
+service : {
+	create_denizen : (text, nat64, nat64, nat64) -> (opt Denizen);
+	get : (principal) -> (opt Denizen) query;
+	get_all_denizens : () -> (vec Denizen) query;
+	insert : (principal, Denizen) -> (opt Denizen);
+};

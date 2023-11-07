@@ -5,18 +5,14 @@
 	import { dS } from '$lib/stores';
 	import { syncAuth } from '$lib/stores';
 
-	// async function init() {
-	// 	return new Promise((resolve) => {
-	// 		setTimeout(resolve, 1000);
-	// 	});
-	// }
-
-	// onMount(async () => {
-
-	// });
+	async function init() {
+		return new Promise((resolve) => {
+			setTimeout(resolve, 1000);
+		});
+	}
 </script>
 
-{#await syncAuth()}
+{#await init()}
 	<Spinner />
 {:then _}
 	<slot />

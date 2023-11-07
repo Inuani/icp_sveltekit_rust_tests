@@ -25,25 +25,22 @@
 		}
 	};
 
-	let denizens:any = [];
+	let denizens: any = [];
 
 	const fetchDenizens = async () => {
-        if ($dS.backend) {
-            try {
-                denizens = await $dS.backend.get_all_denizens();
-                console.log('Fetched denizens:', denizens);
-            } catch (error) {
-                console.error('Error fetching denizens:', error);
-            }
-        }
-    };
+		if ($dS.backend) {
+			try {
+				denizens = await $dS.backend.get_all_denizens();
+				console.log('Fetched denizens:', denizens);
+			} catch (error) {
+				console.error('Error fetching denizens:', error);
+			}
+		}
+	};
 
-	
-    $: if ($dS.backend) {
+	$: if ($dS.backend) {
 		fetchDenizens();
 	}
-    
-
 </script>
 
 <section>
@@ -66,17 +63,16 @@
 		<br />
 
 		{#if $dS.backend && denizens}
-	{#each denizens as denizen (denizen.principal)}
-	  <div>
-	    Principal: {denizen.principal}
-	    Name: {denizen.dname}
-	    XP: {denizen.xp}
-	    Level: {denizen.level}
-	    Token Balance: {denizen.token_balance}
-	  </div>
-	{/each}
-{/if}
-
+			{#each denizens as denizen (denizen.principal)}
+				<div>
+					Principal: {denizen.principal}
+					Name: {denizen.dname}
+					XP: {denizen.xp}
+					Level: {denizen.level}
+					Token Balance: {denizen.token_balance}
+				</div>
+			{/each}
+		{/if}
 
 		<button on:click={handleLogout}>Logout</button>
 	{:else}

@@ -12,7 +12,7 @@ const MAX_VALUE_SIZE: u32 = 1000;
 pub struct Denizen {
     pub principal: Principal,
     pub dname: String,
-	// pub firstname: String,
+	pub firstname: Option<String>,
 	// pub lastname: String,
 	// pub email: String,
 	// pub birthdate: String,
@@ -37,6 +37,12 @@ pub struct  Achievement {
 
 #[derive(Clone, CandidType, Deserialize, Ord, Eq, PartialOrd, PartialEq)]
 pub struct StablePrincipal(pub Principal);
+
+impl StablePrincipal {
+    pub fn into_inner(self) -> Principal {
+        self.0
+    }
+}
 
 impl Storable for StablePrincipal {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {

@@ -1,2 +1,2 @@
-type Result = variant { Ok : principal; Err : text };
+type Result = variant { Ok : principal; Err };
 service : { generate : (text) -> (Result) }

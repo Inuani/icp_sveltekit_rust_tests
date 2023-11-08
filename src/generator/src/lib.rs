@@ -1,10 +1,17 @@
-use ic_cdk::{caller, print, api};
-use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
-use ic_cdk_macros::{query, update, export_candid, pre_upgrade, post_upgrade};
+use ic_cdk::{caller, api, export_candid};
+use ic_stable_structures::memory_manager::{ VirtualMemory};
+use ic_cdk_macros::{query, update, pre_upgrade, post_upgrade};
 use candid::{Decode, Encode, Principal, CandidType, Deserialize};
-use ic_stable_structures::vec;
-use ic_stable_structures::{ storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable };
-use std::{borrow::Cow, cell::RefCell, collections::BTreeMap};
+use ic_stable_structures::{DefaultMemoryImpl };
+pub const CREATE_CANISTER_CYCLES: u128 = 100_000_000_000u128;
+use crate::types::ic::WasmArg;
+use crate::types::interface::SegmentArgs;
+use ic_cdk::api::call::{CallResult, RejectionCode};
+use ic_cdk::api::management_canister::main::{ create_canister, install_code as ic_install_code
+	, CanisterInstallMode, CanisterSettings,
+    CreateCanisterArgument, InstallCodeArgument,
+};
+
 
 mod types;
 
@@ -25,29 +32,21 @@ thread_local! {
 }
 
 #[update]
-async fn generate(name: String)-> Result<Principal, String>
+async fn generate(name: String)-> Result<Principal, ()>
 {
 	let args = WasmArg {
 		wasm: std::include_bytes!("../../../.dfx/local/canisters/template/template.wasm").to_vec(),
 		install_arg: Encode!(&SegmentArgs {
+			
 			controllers: vec![caller(), api::id()]
 		}).unwrap()
 	};
 
-	return create_canister_install_code(&args).await;
+	let res = create_canister_install_code(&args).await.unwrap();
+	// intercanister call, objectif call a init method with all the arg needed
+	// api::call::call::<(String,), ()>(res.clone(), "set_name", (name,)).await;
+	return Ok(res);
 }
-
-pub const CREATE_CANISTER_CYCLES: u128 = 100_000_000_000u128;
-use crate::types::ic::WasmArg;
-use crate::types::interface::SegmentArgs;
-use crate::types::state::{SegmentStatus, SegmentStatusResult};
-use ic_cdk::api::call::CallResult;
-use ic_cdk::api::management_canister::main::{
-    canister_status as ic_canister_status, create_canister, install_code as ic_install_code,
-    update_settings, CanisterId, CanisterIdRecord, CanisterInstallMode, CanisterSettings,
-    CreateCanisterArgument, InstallCodeArgument, UpdateSettingsArgument,
-};
-use ic_cdk::api::time;
 
 pub async fn create_canister_install_code(wasm_arg: &WasmArg) -> Result<Principal, String> {
 	let controllers = vec![caller(), api::id()];

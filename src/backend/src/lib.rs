@@ -16,7 +16,7 @@ thread_local! {
 
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> =
         RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
-    pub static S_DENIZENS: RefCell<StableBTreeMap<StablePrincipal, Denizen, Memory>> = RefCell::new(
+    pub static S_DENIZENS: RefCell<StableBTreeMap<Principal, Denizen, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(0))),
         )
@@ -57,8 +57,8 @@ fn post_upgrade() {
 
 #[query]
 fn get(key: Principal) -> Option<Denizen> {
-    let stable_key = StablePrincipal(key);
-    S_DENIZENS.with(|p| p.borrow().get(&stable_key))
+    // let stable_key = StablePrincipal(key);
+    S_DENIZENS.with(|p| p.borrow().get(&key))
 }
 
 #[update]

@@ -1,0 +1,2 @@
+type Result = variant { Ok : principal; Err : text };
+service : { generate : (text) -> (Result) }

@@ -1,12 +1,17 @@
 {
 	"canisters": {
-		"backend": {
-			"candid": "src/backend/backend.did",
-			"package": "backend",
+		"generator": {
+			"candid": "src/generator/generator.did",
+			"package": "generator",
+			"type": "rust"
+		},
+		"template": {
+			"candid": "src/template/template.did",
+			"package": "template",
 			"type": "rust"
 		},
 		"frontend": {
-			"dependencies": ["backend"],
+			"dependencies": ["generator"],
 			"frontend": {
 				"entrypoint": "build/index.html"
 			},

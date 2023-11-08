@@ -1,14 +1,14 @@
 type Denizen = record {
-  xp : nat64;
-  "principal" : principal;
-  firstname : opt text;
-  level : nat64;
-  token_balance : nat64;
-  dname : text;
+	xp : nat64;
+	"principal" : principal;
+	firstname : opt text;
+	level : nat64;
+	token_balance : nat64;
+	dname : text;
 };
 service : {
-  create_denizen : (text, opt text, nat64, nat64, nat64) -> (opt Denizen);
-  get : (principal) -> (opt Denizen) query;
-  get_all_denizens : () -> (vec Denizen) query;
-  insert : (principal, Denizen) -> (opt Denizen);
-}
+	create_denizen : (text, opt text, nat64, nat64, nat64) -> (opt Denizen);
+	get : (principal) -> (opt Denizen) query;
+	get_all_denizens : () -> (vec Denizen) query;
+	insert : (principal, Denizen) -> (opt Denizen);
+};

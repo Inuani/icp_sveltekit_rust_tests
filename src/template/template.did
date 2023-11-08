@@ -1,1 +1,6 @@
-service : { get_name : () -> (text) query; set_name : (text) -> () }
+service : {
+  get_jesus : () -> (text) query;
+  get_name : () -> (text) query;
+  get_pancreas : () -> (text) query;
+  set_name : (text) -> ();
+}

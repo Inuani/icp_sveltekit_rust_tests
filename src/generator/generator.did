@@ -1,2 +1,28 @@
-type Result = variant { Ok : principal; Err };
-service : { generate : (text) -> (Result) }
+type Dao = record {
+  id : principal;
+  controllers : vec principal;
+  owner : principal;
+  name : text;
+};
+type RejectionCode = variant {
+  NoError;
+  CanisterError;
+  SysTransient;
+  DestinationInvalid;
+  Unknown;
+  SysFatal;
+  CanisterReject;
+};
+type Result = variant {
+  Ok : record { text };
+  Err : record { RejectionCode; text };
+};
+type Result_1 = variant { Ok : principal; Err };
+type Result_2 = variant { Ok; Err : text };
+service : {
+  call_dao_function : (text, text) -> (Result);
+  generate : (text) -> (Result_1);
+  get_daos : () -> (vec record { text; Dao }) query;
+  set_dao_name : (text, text) -> ();
+  update_daos_code : () -> (Result_2);
+}

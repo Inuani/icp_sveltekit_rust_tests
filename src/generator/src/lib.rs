@@ -1,3 +1,6 @@
+use std::borrow::Cow;
+use std::cell::RefCell;
+
 use ic_cdk::{caller, api, export_candid};
 use ic_stable_structures::memory_manager::{ VirtualMemory};
 use ic_cdk_macros::{query, update, pre_upgrade, post_upgrade};
@@ -12,40 +15,126 @@ use ic_cdk::api::management_canister::main::{ create_canister, install_code as i
     CreateCanisterArgument, InstallCodeArgument,
 };
 
+use ic_stable_structures::{StableBTreeMap, Storable, storable::Bound, memory_manager::MemoryId, memory_manager::MemoryManager};
+const MAX_VALUE_SIZE: u32 = 1000;
 
 mod types;
 
+
+#[derive(CandidType, Deserialize, Clone)]
+pub struct Dao {
+	pub name: String,
+	pub id: Principal,
+	pub owner: Principal,
+	pub controllers: Vec<Principal>,
+
+}
+impl Storable for Dao {
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+    const BOUND: Bound = Bound::Bounded {
+        max_size: MAX_VALUE_SIZE,
+        is_fixed_size: false,
+    };
+  }
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 thread_local! {
     // pub static H_DENIZENS: RefCell<BTreeMap<Principal, Denizen>> = RefCell::new(BTreeMap::new());
 
-    // static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> =
-    //     RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
+    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> =
+        RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
 
-    // pub static S_DENIZENS: RefCell<StableBTreeMap<Principal, Denizen, Memory>> = RefCell::new(
-    //     StableBTreeMap::init(
-    //         MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(0))),
-    //     )
-    // );
+    pub static DAOS: RefCell<StableBTreeMap<String, Dao, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(0))),
+        )
+    );
 }
 
-#[update]
-async fn generate(name: String)-> Result<Principal, ()>
+fn get_wasm() -> WasmArg
 {
-	let args = WasmArg {
+	WasmArg {
 		wasm: std::include_bytes!("../../../.dfx/local/canisters/template/template.wasm").to_vec(),
 		install_arg: Encode!(&SegmentArgs {
 			
 			controllers: vec![caller(), api::id()]
 		}).unwrap()
-	};
+	}
+}
+
+#[update]
+async fn generate(name: String)-> Result<Principal, ()>
+{
+	let args = get_wasm();
 
 	let res = create_canister_install_code(&args).await.unwrap();
-	// intercanister call, objectif call a init method with all the arg needed
-	// api::call::call::<(String,), ()>(res.clone(), "set_name", (name,)).await;
+	DAOS.with(|f| {
+		f.borrow_mut().insert(name.clone(), Dao {
+			name: name.clone(),
+			id: res,
+			owner: caller(),
+			controllers: vec![caller(), api::id()],
+		});
+	});
 	return Ok(res);
+}
+
+#[update]
+async fn update_daos_code() -> Result< (), String> {
+	// let dao = DAOS.into().bor;
+	let wasm_arg = get_wasm();
+
+	let daos = get_daos();
+	for i in daos {
+		let install: Result<(), (RejectionCode, String)> = install_code(i.1.id, &wasm_arg, CanisterInstallMode::Upgrade).await;
+
+		match install {
+			Err(reject) => {
+				return Err(reject.1 + "MMMMMMM");
+			},
+			Ok(_) => (),
+		}
+	}
+	Ok(())
+}
+
+#[update]
+async fn set_dao_name(name: String, new: String) -> () {
+	// let dao = DAOS.into().bor;
+
+	let dao = DAOS.with(|p|
+		{
+			p.borrow().get(&name).unwrap()
+		}
+	);
+	api::call::call::<(String,), ()>(dao.id.clone(), "set_name", (new,)).await;
+}
+
+#[update]
+async fn call_dao_function(name: String, function: String) -> Result<(String,), (RejectionCode, std::string::String)>{
+	let dao: Dao = DAOS.with(|p|
+		{
+			p.borrow().get(&name).unwrap()
+		}
+	);
+	api::call::call::<(), (String,)>(dao.id.clone(), &function, ()).await
+}
+
+#[query]
+fn get_daos() -> Vec<(String, Dao)>{
+	// let dao = DAOS.into().bor;
+
+	DAOS.with(|p|
+		{
+			p.borrow().iter().collect::<Vec<(String, Dao)>>()
+		}
+	)
 }
 
 pub async fn create_canister_install_code(wasm_arg: &WasmArg) -> Result<Principal, String> {
@@ -66,7 +155,7 @@ pub async fn create_canister_install_code(wasm_arg: &WasmArg) -> Result<Principa
         Err((_, message)) => Err(["Failed to create canister.", &message].join(" - ")),
         Ok(record) => {
             let canister_id = record.0.canister_id;
-            let install = install_code(canister_id, wasm_arg, CanisterInstallMode::Install).await;
+            let install: Result<(), (RejectionCode, String)> = install_code(canister_id, wasm_arg, CanisterInstallMode::Install).await;
 
             match install {
                 Err(reject) => Err(reject.1.to_string()),

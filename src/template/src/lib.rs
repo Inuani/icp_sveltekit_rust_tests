@@ -5,7 +5,7 @@
 use std::{cell::RefCell};
 
 use ic_cdk::{export_candid, query, update};
-// use ic_cdk_macros::{update, export_candid, query};
+
 
 mod types;
 // mod denizens { mod denizens; }
@@ -21,6 +21,19 @@ fn get_name() -> String
 {
 	NAME.with(|n| n.borrow().clone())
 }
+
+#[query]
+fn get_jesus() -> String
+{
+	"Jesus".to_string()
+}
+
+#[query]
+fn get_pancreas() -> String
+{
+	"Pancreas".to_string()
+}
+
 
 #[update]
 fn set_name(name: String) -> ()

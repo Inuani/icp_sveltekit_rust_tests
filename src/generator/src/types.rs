@@ -1,3 +1,8 @@
+use std::{borrow::Cow};
+
+use candid::{CandidType, Deserialize, Principal, Encode, Decode};
+use ic_stable_structures::{Storable, storable::Bound};
+
 pub mod state {
     use candid::CandidType;
     use candid::Principal;
@@ -200,3 +205,42 @@ pub mod cronjob {
         pub cycles_threshold: Option<u64>,
     }
 }
+
+#[derive(CandidType, Deserialize, Clone)]
+pub struct SocietyInfos {
+	pub name: String,
+	pub description: String,
+	pub canister_id: Principal,
+	pub is_denisen: bool,
+	pub a_denizens: u64,
+}
+
+#[derive(CandidType, Deserialize, Clone)]
+pub struct SocietyArgs {
+	pub name: String,
+	pub description: String,
+}
+
+#[derive(CandidType, Deserialize, Clone)]
+pub struct Society {
+	pub name: String,
+	pub description: String,
+	
+	pub canister_id: Principal,
+	pub owner: Principal,
+	pub controllers: Vec<Principal>,
+	pub denizens_principals: Vec<Principal>,
+}
+
+impl Storable for Society {
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+    const BOUND: Bound = Bound::Bounded {
+        max_size: 1000,
+        is_fixed_size: false,
+    };
+  }

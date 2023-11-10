@@ -12,8 +12,17 @@ type Result = variant {
   Err : record { RejectionCode; text };
 };
 type Result_1 = variant { Ok : principal; Err : text };
-type Result_2 = variant { Ok; Err : record { RejectionCode; text } };
-type Result_3 = variant { Ok; Err : text };
+type Result_2 = variant { Ok : Society; Err : text };
+type Result_3 = variant { Ok; Err : record { RejectionCode; text } };
+type Result_4 = variant { Ok; Err : text };
+type Society = record {
+  denizens_principals : vec principal;
+  controllers : vec principal;
+  owner : principal;
+  name : text;
+  canister_id : principal;
+  description : text;
+};
 type SocietyArgs = record { name : text; description : text };
 type SocietyInfos = record {
   is_denisen : bool;
@@ -27,7 +36,8 @@ service : {
   create_society : (SocietyArgs) -> (Result_1);
   get_my_societies : () -> (vec SocietyInfos) query;
   get_societies : () -> (vec SocietyInfos) query;
-  set_society_name : (text, text) -> (Result_2);
-  update_societies_wasm_code : () -> (Result_2);
-  update_society : (text, SocietyArgs) -> (Result_3);
+  get_society : (text) -> (Result_2) query;
+  set_society_name : (text, text) -> (Result_3);
+  update_societies_wasm_code : () -> (Result_3);
+  update_society : (text, SocietyArgs) -> (Result_4);
 }

@@ -50,7 +50,7 @@ export async function login() {
 		identityProvider:
 			process.env.DFX_NETWORK === 'ic'
 				? 'https://identity.ic0.app/#authorize'
-				: `http://127.0.0.1:8000/?canisterId=dzh22-nuaaa-aaaaa-qaaoa-cai`,
+				: `http://127.0.0.1:8000/?canisterId=be2us-64aaa-aaaaa-qaabq-cai`,
 		maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),
 		onSuccess: async () => {
 			update_dS_State();

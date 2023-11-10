@@ -91,4 +91,16 @@ fn update_society(name: String, society: SocietyArgs) -> Result<(), String>
 	)
 }
 
+#[query]
+fn get_society(name: String) -> Result<Society, String> {
+    SOCIETIES.with(|societies| {
+        let societies_borrowed = societies.borrow();
+        match societies_borrowed.get(&name) {
+            Some(society) => Ok(society.clone()),
+            None => Err("Society not found".to_string()),
+        }
+    })
+}
+
+
 export_candid!();

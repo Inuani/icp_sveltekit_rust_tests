@@ -19,7 +19,7 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"prebuild": "npm run generate",
-		"generate": "./did.sh && dfx generate && node ./update.types.mjs && npm run format"
+		"generate": "dfx generate && node ./update.types.mjs && npm run format"
 	},
 	"devDependencies": {
 		"@rollup/plugin-inject": "^5.0.5",

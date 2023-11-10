@@ -1,0 +1,33 @@
+type RejectionCode = variant {
+  NoError;
+  CanisterError;
+  SysTransient;
+  DestinationInvalid;
+  Unknown;
+  SysFatal;
+  CanisterReject;
+};
+type Result = variant {
+  Ok : record { text };
+  Err : record { RejectionCode; text };
+};
+type Result_1 = variant { Ok : principal; Err : text };
+type Result_2 = variant { Ok; Err : record { RejectionCode; text } };
+type Result_3 = variant { Ok; Err : text };
+type SocietyArgs = record { name : text; description : text };
+type SocietyInfos = record {
+  is_denisen : bool;
+  name : text;
+  canister_id : principal;
+  description : text;
+  a_denizens : nat64;
+};
+service : {
+  call_society_function : (text, text) -> (Result);
+  create_society : (SocietyArgs) -> (Result_1);
+  get_my_societies : () -> (vec SocietyInfos) query;
+  get_societies : () -> (vec SocietyInfos) query;
+  set_society_name : (text, text) -> (Result_2);
+  update_societies : () -> (Result_2);
+  update_society : (text, SocietyArgs) -> (Result_3);
+}

@@ -1,0 +1,36 @@
+{
+	"canisters": {
+		"generator": {
+			"candid": "src/generator/generator.did",
+			"package": "generator",
+			"type": "rust"
+		},
+		"template": {
+			"candid": "src/template/template.did",
+			"package": "template",
+			"type": "rust"
+		},
+		"frontend": {
+			"dependencies": ["generator"],
+			"frontend": {
+				"entrypoint": "build/index.html"
+			},
+			"source": ["build/"],
+			"type": "assets"
+		}
+	},
+	"defaults": {
+		"build": {
+			"args": "",
+			"packtool": ""
+		}
+	},
+	"dfx": "0.15.1",
+	"networks": {
+		"local": {
+			"bind": "127.0.0.1:8000",
+			"type": "ephemeral"
+		}
+	},
+	"version": 1
+}

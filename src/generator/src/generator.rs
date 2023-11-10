@@ -4,7 +4,7 @@ use candid::{Principal, Encode};
 use ic_cdk_macros::update;
 pub const CREATE_CANISTER_CYCLES: u128 = 100_000_000_000u128;
 use crate::types::{Society, SocietyArgs};
-use crate::types::interface::SegmentArgs;
+use crate::types::interface::{SegmentArgs, SegmentArgsUpdate};
 use crate::{SOCIETIES, get_societies, call};
 use crate::types::ic::WasmArg;
 use ic_cdk::api::call::{CallResult, RejectionCode};
@@ -13,13 +13,23 @@ use ic_cdk::api::management_canister::main::{ create_canister, install_code as i
     CreateCanisterArgument, InstallCodeArgument,
 };
 
-fn get_wasm() -> WasmArg
+fn get_wasm_init(name: String) -> WasmArg
 {
 	WasmArg {
-		wasm: std::include_bytes!("../../../.dfx/local/canisters/template/template.wasm").to_vec(),
+		wasm: std::include_bytes!("../../../target/wasm32-unknown-unknown/release/template_copy.wasm.gz").to_vec(),
 		install_arg: Encode!(&SegmentArgs {
-			
-			controllers: vec![caller(), api::id()]
+			controllers: vec![caller(), api::id()],
+			name
+		}).unwrap()
+	}
+}
+
+fn get_wasm_update() -> WasmArg
+{
+	WasmArg {
+		wasm: std::include_bytes!("../../../target/wasm32-unknown-unknown/release/template_copy.wasm.gz").to_vec(),
+		install_arg: Encode!(&SegmentArgsUpdate {
+			controllers: vec![caller(), api::id()],
 		}).unwrap()
 	}
 }
@@ -27,7 +37,7 @@ fn get_wasm() -> WasmArg
 #[update]
 async fn create_society(args: SocietyArgs)-> Result<Principal, String>
 {
-	let wasm_args = get_wasm();
+	let wasm_args = get_wasm_init(args.name.clone());
 
 	if let Some(_) = SOCIETIES.with(|p| { p.borrow().get(&args.name)}) {
 		return	Err("Society already exists".to_string());
@@ -55,9 +65,9 @@ async fn create_society(args: SocietyArgs)-> Result<Principal, String>
 }
 
 #[update]
-async fn update_societies() -> Result< (), (RejectionCode, String)> {
+async fn update_societies_wasm_code() -> Result< (), (RejectionCode, String)> {
 	// let dao = DAOS.into().bor;
-	let wasm_arg = get_wasm();
+	let wasm_arg = get_wasm_update();
 
 	let societies = get_societies();
 	for society in societies {

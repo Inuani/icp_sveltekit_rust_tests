@@ -35,7 +35,7 @@ export const idlFactory = ({ IDL }) => {
 		get_my_societies: IDL.Func([], [IDL.Vec(SocietyInfos)], ['query']),
 		get_societies: IDL.Func([], [IDL.Vec(SocietyInfos)], ['query']),
 		set_society_name: IDL.Func([IDL.Text, IDL.Text], [Result_2], []),
-		update_societies: IDL.Func([], [Result_2], []),
+		update_societies_wasm_code: IDL.Func([], [Result_2], []),
 		update_society: IDL.Func([IDL.Text, SocietyArgs], [Result_3], [])
 	});
 };

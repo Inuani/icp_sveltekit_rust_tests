@@ -1,6 +1,5 @@
-service : {
-  get_jesus : () -> (text) query;
+type SegmentArgs = record { controllers : vec principal; name : text };
+service : (SegmentArgs) -> {
   get_name : () -> (text) query;
-  get_pancreas : () -> (text) query;
   set_name : (text) -> ();
 }

@@ -1,25 +1,27 @@
 <script lang="ts">
-	import Spinner from '$lib/components/Spinner.svelte';
-	import { onMount } from 'svelte';
-	import { generatorCanisterId } from '$lib/constants';
+    import Spinner from '$lib/components/Spinner.svelte';
+    import { onMount } from 'svelte';
+    import { goto } from '$app/navigation';
+    import { dS } from '$lib/stores';
+    import { syncAuth } from '$lib/stores';
 
-	async function init() {
-		return new Promise((resolve) => {
-			setTimeout(resolve, 1000);
-		});
-	}
+    let isLoading = true;
 
-	onMount(() => {
-  		console.log('helo', generatorCanisterId);
-	});
-
+    onMount(async () => {
+        await syncAuth();
+        if (!$dS.identity && location.pathname !== '/login') {
+            goto('/login');
+        }
+        isLoading = false;
+    });
 </script>
 
-{#await init()}
-	<Spinner />
-{:then _}
-	<slot />
-{/await}
+{#if isLoading}
+    <Spinner />
+{:else}
+    <slot />
+{/if}
+
 
 <style lang="scss" global>
 	@import '../lib/styles/global.scss';

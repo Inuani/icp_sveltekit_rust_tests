@@ -5,33 +5,25 @@ import type { Principal } from '@dfinity/principal';
 import { writable } from 'svelte/store';
 import { createActor } from '../../../declarations/generator';
 import type { _SERVICE } from '../../../declarations/generator/generator.did';
-// import { createActor } from '../../../declarations/backend';
-// import type { _SERVICE } from '../../../declarations/backend/backend.did';
 
 let authClient: AuthClient | null = null;
 
 export type Session = {
-	backend: ActorSubclass<_SERVICE> | null;
-	principal: Principal | null | undefined;
-	// denizen: Denizen | null;
+	generator: ActorSubclass<_SERVICE> | null;
 	identity: Identity | null | undefined;
 };
 
 export const dS = writable<Session>({
-	backend: null,
-	principal: null,
-	// denizen: null,
+	generator: null,
 	identity: null
 });
 
 function update_dS_State() {
 	const identity = authClient?.getIdentity();
-	const principal = identity?.getPrincipal();
 	dS.update((value) => ({
 		...value,
 		identity: identity,
-		principal: principal,
-		backend: createActor(generatorCanisterId, { agentOptions: { host, identity } })
+		generator: createActor(generatorCanisterId, { agentOptions: { host, identity } })
 	}));
 }
 
@@ -58,7 +50,7 @@ export async function login() {
 		identityProvider:
 			process.env.DFX_NETWORK === 'ic'
 				? 'https://identity.ic0.app/#authorize'
-				: `http://127.0.0.1:8000/?canisterId=be2us-64aaa-aaaaa-qaabq-cai`,
+				: `http://127.0.0.1:8000/?canisterId=dzh22-nuaaa-aaaaa-qaaoa-cai`,
 		maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000 * 1000),
 		onSuccess: async () => {
 			update_dS_State();

@@ -86,6 +86,12 @@ pub mod interface {
     #[derive(CandidType, Deserialize)]
     pub struct SegmentArgs {
         pub controllers: Vec<ControllerId>,
+        pub name: String,
+    }
+
+    #[derive(CandidType, Deserialize)]
+    pub struct SegmentArgsUpdate {
+        pub controllers: Vec<ControllerId>,
     }
 
     #[derive(CandidType, Deserialize, Clone)]
@@ -220,6 +226,8 @@ pub struct SocietyArgs {
 	pub name: String,
 	pub description: String,
 }
+
+
 
 #[derive(CandidType, Deserialize, Clone)]
 pub struct Society {

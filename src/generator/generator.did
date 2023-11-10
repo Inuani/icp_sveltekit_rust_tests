@@ -28,6 +28,6 @@ service : {
   get_my_societies : () -> (vec SocietyInfos) query;
   get_societies : () -> (vec SocietyInfos) query;
   set_society_name : (text, text) -> (Result_2);
-  update_societies : () -> (Result_2);
+  update_societies_wasm_code : () -> (Result_2);
   update_society : (text, SocietyArgs) -> (Result_3);
 }

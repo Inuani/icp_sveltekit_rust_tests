@@ -38,7 +38,7 @@
 				const principalNewCanister = result.Ok;
 				const newCanisterActor = createActorForNewCanister(principalNewCanister, host);
 
-				const nameOfSoc = await newCanisterActor.set_name('oudaa');
+				// const nameOfSoc = await newCanisterActor.set_name('oudaa');
 				const getName = await newCanisterActor.get_name();
 				console.log('soc:', getName);
 			}

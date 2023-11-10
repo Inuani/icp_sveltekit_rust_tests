@@ -45,6 +45,7 @@
 	"type": "module",
 	"dependencies": {
 		"@dfinity/agent": "^0.19.3",
+		"@dfinity/auth-client": "^0.19.3",
 		"@dfinity/candid": "^0.19.3",
 		"@dfinity/principal": "^0.19.3",
 		"eslint-plugin-svelte": "^2.35.0"

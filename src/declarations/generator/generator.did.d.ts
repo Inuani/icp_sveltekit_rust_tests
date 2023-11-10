@@ -30,6 +30,6 @@ export interface _SERVICE {
 	get_my_societies: ActorMethod<[], Array<SocietyInfos>>;
 	get_societies: ActorMethod<[], Array<SocietyInfos>>;
 	set_society_name: ActorMethod<[string, string], Result_2>;
-	update_societies: ActorMethod<[], Result_2>;
+	update_societies_wasm_code: ActorMethod<[], Result_2>;
 	update_society: ActorMethod<[string, SocietyArgs], Result_3>;
 }

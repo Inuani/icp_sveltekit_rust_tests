@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import type { UserConfig } from 'vite';
 import { defineConfig, loadEnv } from 'vite';
+import compression from 'vite-plugin-compression';
 
 // npm run dev = local
 // npm run build = local
@@ -41,7 +42,12 @@ const readCanisterIds = ({ prefix }: { prefix?: string }): Record<string, string
 };
 
 const config: UserConfig = {
-	plugins: [sveltekit()],
+	plugins: [
+		sveltekit(),
+		compression({
+			// plugin options
+		})
+	],
 	build: {
 		target: 'es2020',
 		rollupOptions: {

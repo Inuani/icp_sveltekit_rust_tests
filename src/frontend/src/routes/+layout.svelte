@@ -4,10 +4,13 @@
     import { goto } from '$app/navigation';
     import { dS } from '$lib/stores';
     import { syncAuth } from '$lib/stores';
+    import { i18n } from '$lib/stores/i18n.store';
 
     let isLoading = true;
 
     onMount(async () => {
+        const userLang = localStorage.getItem('userLang') || 'en';
+        await i18n.switchLang(userLang);
         await syncAuth();
         if (!$dS.identity && location.pathname !== '/login') {
             goto('/login');

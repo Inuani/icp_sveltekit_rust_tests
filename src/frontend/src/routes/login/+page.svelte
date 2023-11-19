@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { dS, login, logout } from '$lib/stores';
+	import { i18n } from '$lib/stores/i18n.store';
 
 	const handleLoginII = async () => {
 		login();
@@ -16,7 +17,8 @@
 	<br />
 
 	{#if $dS.identity}
-		logged in!
+	<p>{$i18n.core.yes}</p>
+	{$i18n.core.logged_in}
 		<button on:click={handleLogout}>Logout</button>
 	{:else}
 		<button on:click={handleLoginII}>Login with internet identity</button>
